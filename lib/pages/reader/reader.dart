@@ -219,13 +219,6 @@ class _ReaderState extends State<Reader>
     )) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     }
-    if (appdata.settings.getReaderSetting(
-      cid,
-      type.sourceKey,
-      'enableTurnPageByVolumeKey',
-    )) {
-      handleVolumeEvent();
-    }
     setImageCacheSize();
     Future.delayed(const Duration(milliseconds: 200), () {
       LocalFavoritesManager().onRead(cid, type);
@@ -246,6 +239,17 @@ class _ReaderState extends State<Reader>
       _checkImagesPerPageChange();
     }
     initReaderWindow();
+    if (App.isMobile &&
+        ModalRoute.isCurrentOf(context) == true &&
+        appdata.settings.getReaderSetting(
+          cid,
+          type.sourceKey,
+          Settings.volumeKeyPagingSetting,
+        ) == true) {
+      handleVolumeEvent();
+    } else {
+      stopVolumeEvent();
+    }
   }
 
   void setImageCacheSize() async {
@@ -547,38 +551,25 @@ abstract mixin class _ImagePerPageHandler {
   }
 }
 
-abstract mixin class _VolumeListener {
-  bool toNextPage();
-
-  bool toPrevPage();
-
-  bool toNextChapter();
-
-  bool toPrevChapter({bool toLastPage = false});
-
+mixin _VolumeListener on _ReaderLocation {
   VolumeListener? volumeListener;
 
   void onDown() {
+    if (isLoading || _imageViewController?.mounted != true) return;
     if (!toNextPage()) {
       toNextChapter();
     }
   }
 
   void onUp() {
+    if (isLoading || _imageViewController?.mounted != true) return;
     if (!toPrevPage()) {
       toPrevChapter(toLastPage: true);
     }
   }
 
   void handleVolumeEvent() {
-    if (!App.isAndroid) {
-      // Currently only support Android
-      return;
-    }
-    if (volumeListener != null) {
-      volumeListener?.cancel();
-    }
-    volumeListener = VolumeListener(onDown: onDown, onUp: onUp)..listen();
+    volumeListener ??= (VolumeListener(onDown: onDown, onUp: onUp)..listen());
   }
 
   void stopVolumeEvent() {
@@ -793,6 +784,8 @@ enum ReaderMode {
 }
 
 abstract interface class _ImageViewController {
+  bool get mounted;
+
   void toPage(int page);
 
   Future<void> animateToPage(int page);

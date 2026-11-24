@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 class VolumeListener {
   static const channel = EventChannel('venera/volume');
+  static final _events = channel.receiveBroadcastStream();
 
   void Function()? onUp;
 
@@ -14,7 +15,7 @@ class VolumeListener {
   StreamSubscription? stream;
 
   void listen() {
-    stream = channel.receiveBroadcastStream().listen(onEvent);
+    stream = _events.listen(onEvent);
   }
 
   void onEvent(event) {

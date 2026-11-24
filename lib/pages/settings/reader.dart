@@ -347,12 +347,12 @@ class _ReaderSettingsState extends State<ReaderSettings> {
           comicSource: isEnabledSpecificSettings ? widget.comicSource : null,
           useDeviceSettings: useDeviceSpecificSettings,
         ).toSliver(),
-        if (App.isAndroid)
+        if (App.isMobile)
           _SwitchSetting(
             title: 'Turn page by volume keys'.tl,
-            settingKey: 'enableTurnPageByVolumeKey',
+            settingKey: Settings.volumeKeyPagingSetting,
             onChanged: () {
-              widget.onChanged?.call('enableTurnPageByVolumeKey');
+              widget.onChanged?.call(Settings.volumeKeyPagingSetting);
             },
             comicId: isEnabledSpecificSettings ? widget.comicId : null,
             comicSource: isEnabledSpecificSettings ? widget.comicSource : null,

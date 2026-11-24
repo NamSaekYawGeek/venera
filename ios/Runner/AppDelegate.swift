@@ -21,6 +21,9 @@ import Foundation // 添加此行
           fatalError("rootViewController is not of type FlutterViewController")
     }
 
+    let volumeChannel = FlutterEventChannel(name: "venera/volume", binaryMessenger: controller.binaryMessenger)
+    volumeChannel.setStreamHandler(VolumeButtonStream(view: controller.view))
+
     let methodChannel = FlutterMethodChannel(name: "venera/method_channel", binaryMessenger: controller.binaryMessenger)
     methodChannel.setMethodCallHandler { (call, result) in
       if call.method == "getProxy" {

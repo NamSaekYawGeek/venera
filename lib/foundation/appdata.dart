@@ -171,6 +171,11 @@ final appdata = Appdata._create();
 class Settings with ChangeNotifier {
   Settings._create();
 
+  // Older iOS installs saved the Android default even though the switch was hidden.
+  static String get volumeKeyPagingSetting => Platform.isIOS
+      ? 'enableTurnPageByVolumeKeyIOS'
+      : 'enableTurnPageByVolumeKey';
+
   final _data = <String, dynamic>{
     'comicDisplayMode': 'detailed', // detailed, brief
     'comicTileScale': 1.00, // 0.75-1.25
@@ -207,6 +212,7 @@ class Settings with ChangeNotifier {
     'dataVersion': 0,
     'quickFavorite': null,
     'enableTurnPageByVolumeKey': true,
+    'enableTurnPageByVolumeKeyIOS': false,
     'enableClockAndBatteryInfoInReader': true,
     'quickCollectImage': 'No', // No, DoubleTap, Swipe
     'authorizationRequired': false,

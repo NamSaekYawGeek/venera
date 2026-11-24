@@ -700,17 +700,6 @@ class _ReaderScaffoldState extends State<_ReaderScaffold> {
               ),
             );
           }
-          if (key == "enableTurnPageByVolumeKey") {
-            if (appdata.settings.getReaderSetting(
-              context.reader.cid,
-              context.reader.type.sourceKey,
-              key,
-            )) {
-              context.reader.handleVolumeEvent();
-            } else {
-              context.reader.stopVolumeEvent();
-            }
-          }
           if (key == "quickCollectImage") {
             addDragListener();
           }
