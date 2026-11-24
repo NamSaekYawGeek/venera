@@ -1,0 +1,40 @@
+name: Build iOS volume-button IPA
+
+on:
+  push:
+    branches: [ios-volume-page-turn]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+      - name: Select upstream Xcode version if installed
+        run: |
+          if [ -d /Applications/Xcode_16.4.app ]; then
+            sudo xcode-select --switch /Applications/Xcode_16.4.app
+          fi
+          xcodebuild -version
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - name: Package unsigned IPA
+        working-directory: build/ios/iphoneos
+        run: |
+          mkdir Payload
+          mv Runner.app Payload/
+          ditto -c -k --keepParent Payload Venera-volume-buttons.ipa
+          unzip -tq Venera-volume-buttons.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Venera-iOS-volume-buttons
+          path: build/ios/iphoneos/Venera-volume-buttons.ipa
+          if-no-files-found: error
